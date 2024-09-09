@@ -1,0 +1,178 @@
+﻿@model IEnumerable<YourNamespace.Models.SprawaModel>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista Spraw</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+            .form-group div {
+                margin: 10px;
+            }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 200px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Wyszukiwarka Spraw</h2>
+
+        <form method="get" action="@Url.Action("Sprawy", "Home")">
+            <div class="form-group">
+                <div>
+                    <label for="searchName">Nazwa Podmiotu:</label>
+                    <input type="text" name="searchName" id="searchName" value="@ViewBag.SearchName" />
+                </div>
+                <div>
+                    <label for="searchFirstName">Imię:</label>
+                    <input type="text" name="searchFirstName" id="searchFirstName" value="@ViewBag.SearchFirstName" />
+                </div>
+                <div>
+                    <label for="searchSurname">Nazwisko:</label>
+                    <input type="text" name="searchSurname" id="searchSurname" value="@ViewBag.SearchSurname" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div>
+                    <label for="startDate">Data rejestracji od:</label>
+                    <input type="date" name="startDate" value="@(ViewBag.StartDate != null ? ((DateTime)ViewBag.StartDate).ToString("yyyy-MM-dd") : "")" />
+                </div>
+                <div>
+                    <label for="endDate">Data rejestracji do:</label>
+                    <input type="date" name="endDate" value="@(ViewBag.EndDate != null ? ((DateTime)ViewBag.EndDate).ToString("yyyy-MM-dd") : "")" />
+                </div>
+            </div>
+            <input type="submit" value="Szukaj" />
+        </form>
+
+        @if (Model.Any())
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>Znak</th>
+                        <th>Uwagi</th>
+                        <th>Data Rejestracji</th>
+                        <th>Data Zakończenia</th>
+                        <th>Prowadzący</th>
+                        <th>Nadawca osoba</th>
+                        <th>Nadawca podmiot</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <a href="https://ezd.podkowalesna.pl/Pismo3.aspx?idpisma=@item.IdPisma" target="_blank">
+                                    @item.Znak
+                                </a>
+                            </td>
+                            <td>@item.Uwagi</td>
+                            <td>@item.DataRejestracji.ToString("yyyy-MM-dd")</td>
+                            <td>@(item.DataZakonczenia.HasValue ? item.DataZakonczenia.Value.ToString("yyyy-MM-dd") : "Brak danych")</td>
+                            <td>@item.Prowadzacy</td>
+                            <td>@item.ImieNazwisko</td>
+                            <td>@item.NazwaPodmiotu</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else if (!string.IsNullOrEmpty(ViewBag.SearchName) || !string.IsNullOrEmpty(ViewBag.SearchSurname))
+        {
+            <p>Nie znaleziono wyników dla podanych kryteriów wyszukiwania.</p>
+        }
+        else
+        {
+            <p>Wprowadź kryteria wyszukiwania, aby wyświetlić wyniki.</p>
+        }
+    </div>
+</body>
+</html>

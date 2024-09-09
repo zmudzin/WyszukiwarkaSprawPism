@@ -1,0 +1,24 @@
+# Ignorowanie katalogów bin i obj
+/bin/
+/obj/
+
+# Ignorowanie ustawieñ specyficznych dla Visual Studio
+.vs/
+*.suo
+*.user
+
+# Ignorowanie paczek NuGet
+/packages/
+
+# Ignorowanie katalogów node_modules
+node_modules/
+
+# Ignorowanie plików logów
+*.log
+
+# Ignorowanie plików systemowych
+Thumbs.db
+.DS_Store
+
+# Ignorowanie plików konfiguracyjnych
+web.config
