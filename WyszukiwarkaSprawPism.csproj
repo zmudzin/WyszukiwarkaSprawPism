@@ -185,6 +185,7 @@
     <Content Include="Web — Kopia.Release.config">
       <DependentUpon>Web — Kopia.config</DependentUpon>
     </Content>
+    <Content Include="Views\Web — Kopia.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
