@@ -50,10 +50,13 @@ namespace YourNamespace.Controllers
             var connectionString = ConfigurationManager.ConnectionStrings["MyDbContext"].ConnectionString;
             var queryBuilder = new StringBuilder(@"
         SELECT a.ID, a.Nazwa AS PismoNazwa, a.Data_Wplyniecia, 
-               c.Nazwa AS NadawcaNazwa, c.Imie, c.Nazwisko
+               c.Nazwa AS NadawcaNazwa, c.Imie, c.Nazwisko,
+               d.Imie AS WlascicielImie,  -- Imię właściciela
+               d.Nazwisko AS WlascicielNazwisko  -- Nazwisko właściciela
         FROM dbo.Pisma a 
         JOIN dbo.Dokument b ON a.ID = b.IdPisma
         JOIN dbo.Adresaci c ON b.MetaIdAdresata = c.Id
+        JOIN dbo.Pracownicy d ON a.IdPracownikaWlasciciela = d.ID
         WHERE 1=1");
 
             if (!string.IsNullOrEmpty(searchDocumentName))
@@ -69,7 +72,7 @@ namespace YourNamespace.Controllers
                 queryBuilder.Append(" AND c.Nazwisko LIKE @searchLastName");
 
             // Jeśli klauzula GROUP BY jest wymagana, dodaj odpowiednie kolumny
-            queryBuilder.Append(" GROUP BY a.ID, a.Nazwa, a.Data_Wplyniecia, c.Nazwa, c.Imie, c.Nazwisko");
+            queryBuilder.Append(" GROUP BY a.ID, a.Nazwa, a.Data_Wplyniecia, c.Nazwa, c.Imie, c.Nazwisko, d.Imie, d.Nazwisko");
 
             var pisma = new List<PismoModel>();
 
@@ -100,7 +103,9 @@ namespace YourNamespace.Controllers
                             DataWplyniecia = reader.GetDateTime(reader.GetOrdinal("Data_Wplyniecia")),
                             NadawcaNazwa = reader["NadawcaNazwa"].ToString(),
                             Imie = reader["Imie"].ToString(),
-                            Nazwisko = reader["Nazwisko"].ToString()
+                            Nazwisko = reader["Nazwisko"].ToString(),
+                            WlascicielImie = reader["WlascicielImie"].ToString(),
+                            WlascicielNazwisko = reader["WlascicielNazwisko"].ToString()
                         };
                         pisma.Add(pismo);
                     }
