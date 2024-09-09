@@ -1,20 +1,154 @@
-﻿/* Set padding to keep content from hitting the edges */
-.body-content {
-    margin-top: 15px;
-    padding-left: 15px;
-    padding-right: 15px;
+﻿body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4; /* Jasny szary */
 }
 
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
-.dl-horizontal dt {
-    white-space: normal;
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff; /* Biały dla lepszej czytelności */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
+h2 {
+    color: #003d5b; /* Ciemny niebieski */
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 28px; /* Zwiększenie wielkości czcionki */
 }
+
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+    .form-group div {
+        margin: 10px;
+    }
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #003d5b; /* Ciemny niebieski */
+}
+
+input[type="text"],
+input[type="date"] {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #cccccc;
+    width: 200px;
+}
+
+input[type="submit"] {
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: none;
+    background-color: #003d5b; /* Ciemny niebieski */
+    color: white;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+    input[type="submit"]:hover {
+        background-color: #002a4d; /* Ciemniejszy niebieski */
+    }
+
+/* Styl dla logo */
+.navbar-brand img {
+    height: 50px;
+}
+
+/* Kolorystyka linków w nawigacji */
+.navbar {
+    background-color: #003d5b; /* Ciemny niebieski */
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Ustawienie do lewej */
+}
+
+
+    .navbar-nav .nav-item {
+        margin: 0 15px; /* Dostosuj odstępy między linkami */
+    }
+
+    .navbar-nav .nav-link {
+        font-size: 18px;
+        font-weight: bold;
+        color: #003d5b; /* Ciemny niebieski dla linków */
+        text-decoration: none; /* Usunięcie podkreślenia */
+    }
+
+        .navbar-nav .nav-link:hover {
+            font-size: 18px; /* Zwiększenie wielkości czcionki po najechaniu */
+            text-decoration: underline; /* Podkreślenie po najechaniu */
+        }
+
+
+/* Styl stopki */
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #003d5b; /* Ciemny niebieski */
+    color: #ffffff; /* Biały */
+}
+
+    footer p {
+        margin: 0;
+        color: #ffffff; /* Biały */
+    }
+
+/* Styl dla tabeli wyników */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #003d5b; /* Ciemny niebieski */
+    color: white;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Styl dla linków w tabeli */
+table a {
+    text-decoration: none;
+    color: #003d5b; /* Ciemny niebieski */
+    font-weight: bold; /* Pogrubienie czcionki */
+}
+
+    table a:hover {
+        text-decoration: underline;
+        color: #003d5b; /* Utrzymanie koloru */
+    }

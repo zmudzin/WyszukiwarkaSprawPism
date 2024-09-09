@@ -1,26 +1,28 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace WebApplication1
+public class RouteConfig
 {
-    public class RouteConfig
+    public static void RegisterRoutes(RouteCollection routes)
     {
-        public static void RegisterRoutes(RouteCollection routes)
-        {
-            routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+        routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            routes.MapRoute(
-                name: "Default",
-                url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Sprawy", id = UrlParameter.Optional }
-            );
+        routes.MapRoute(
+            name: "Pisma",
+            url: "pisma",
+            defaults: new { controller = "Home", action = "WyszukiwarkaPism" }
+        );
 
-            routes.MapRoute(
+        routes.MapRoute(
             name: "Sprawy",
-            url: "Home/Sprawy",
+            url: "sprawy",
             defaults: new { controller = "Home", action = "Sprawy" }
         );
-        }
-    }
 
+        routes.MapRoute(
+            name: "Default",
+            url: "{controller}/{action}/{id}",
+            defaults: new { controller = "Home", action = "Sprawy", id = UrlParameter.Optional }
+        );
+    }
 }
