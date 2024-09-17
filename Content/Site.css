@@ -76,7 +76,7 @@ input[type="submit"] {
 
 /* Kolorystyka linków w nawigacji */
 .navbar {
-    background-color: #003d5b; /* Ciemny niebieski */
+    background-color: #2fa367; /* Ciemny niebieski */
 }
 
     .navbar-nav .nav-link {
@@ -96,13 +96,13 @@ input[type="submit"] {
 footer {
     text-align: center;
     padding: 10px;
-    background-color: #003d5b; /* Ciemny niebieski */
-    color: #ffffff; /* Biały */
+    background-color: #2fa367; /*  zielony */
+    color: #ffffff;
 }
 
     footer p {
         margin: 0;
-        color: #ffffff; /* Biały */
+        color: #ffffff;
     }
 
 /* Styl dla tabeli wyników */

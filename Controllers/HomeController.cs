@@ -11,7 +11,8 @@ namespace YourNamespace.Controllers
 {
     public class HomeController : Controller
     {
-        public async Task<ActionResult> Sprawy(string searchName, string searchSurname, string searchFirstName, DateTime? startDate, DateTime? endDate)
+
+        public async Task<ActionResult> Sprawy(string searchName, string searchSurname, string searchFirstName, DateTime? startDate, DateTime? endDate, string searchZnak)
         {
             // Przekazanie wartości wyszukiwania do widoku
             ViewBag.SearchName = searchName;
@@ -19,20 +20,22 @@ namespace YourNamespace.Controllers
             ViewBag.SearchFirstName = searchFirstName;
             ViewBag.StartDate = startDate;
             ViewBag.EndDate = endDate;
+            ViewBag.SearchZnak = searchZnak;  // Dodajemy searchZnak do ViewBag
 
             // Jeśli brak kryteriów wyszukiwania, nie wykonuj zapytania do bazy danych
             if (string.IsNullOrEmpty(searchName) && string.IsNullOrEmpty(searchSurname) &&
-                string.IsNullOrEmpty(searchFirstName) && !startDate.HasValue && !endDate.HasValue)
+                string.IsNullOrEmpty(searchFirstName) && !startDate.HasValue && !endDate.HasValue && string.IsNullOrEmpty(searchZnak))
             {
                 return View(new List<SprawaModel>());
             }
 
             // Jeśli są kryteria, wykonaj zapytanie
-            var model = await GetSprawyAsync(searchName, searchSurname, searchFirstName, startDate, endDate);
+            var model = await GetSprawyAsync(searchName, searchSurname, searchFirstName, startDate, endDate, searchZnak);
             return View(model);
         }
 
-        public async Task<ActionResult> WyszukiwarkaPism(string searchDocumentName, string searchSenderName, string searchFirstName, string searchLastName, DateTime? startDate, DateTime? endDate)
+
+        public async Task<ActionResult> Pisma(string searchDocumentName, string searchSenderName, string searchFirstName, string searchLastName, DateTime? startDate, DateTime? endDate, string searchZnakWplywu)
         {
             // Przekazanie wartości wyszukiwania do widoku
             ViewBag.SearchDocumentName = searchDocumentName;
@@ -41,32 +44,33 @@ namespace YourNamespace.Controllers
             ViewBag.SearchLastName = searchLastName;
             ViewBag.StartDate = startDate;
             ViewBag.EndDate = endDate;
+            ViewBag.SearchZnakWplywu = searchZnakWplywu;  // Dodajemy searchZnakWplywu do ViewBag
 
             // Jeśli brak kryteriów wyszukiwania, nie wykonuj zapytania do bazy danych
             if (string.IsNullOrEmpty(searchDocumentName) && string.IsNullOrEmpty(searchSenderName) &&
                 string.IsNullOrEmpty(searchFirstName) && string.IsNullOrEmpty(searchLastName) &&
-                !startDate.HasValue && !endDate.HasValue)
+                !startDate.HasValue && !endDate.HasValue && string.IsNullOrEmpty(searchZnakWplywu))
             {
                 return View(new List<PismoModel>());
             }
 
             // Jeśli są kryteria, wykonaj zapytanie
-            var model = await GetPismaAsync(searchDocumentName, searchSenderName, searchFirstName, searchLastName, startDate, endDate);
+            var model = await GetPismaAsync(searchDocumentName, searchSenderName, searchFirstName, searchLastName, startDate, endDate, searchZnakWplywu);
             return View(model);
         }
 
-        private async Task<List<PismoModel>> GetPismaAsync(string searchDocumentName, string searchSenderName, string searchFirstName, string searchLastName, DateTime? startDate, DateTime? endDate)
+        private async Task<List<PismoModel>> GetPismaAsync(string searchDocumentName, string searchSenderName, string searchFirstName, string searchLastName, DateTime? startDate, DateTime? endDate, string searchZnakWplywu)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["MyDbContext"].ConnectionString;
             var queryBuilder = new StringBuilder(@"
-        SELECT a.ID, a.Nazwa AS PismoNazwa, a.Data_Wplyniecia, 
-               c.Nazwa AS NadawcaNazwa, c.Imie, c.Nazwisko,
-               d.Imie AS WlascicielImie, d.Nazwisko AS WlascicielNazwisko
-        FROM dbo.Pisma a 
-        JOIN dbo.Dokument b ON a.ID = b.IdPisma
-        JOIN dbo.Adresaci c ON b.MetaIdAdresata = c.Id
-        JOIN dbo.Pracownicy d ON a.IdPracownikaWlasciciela = d.ID
-        WHERE 1=1");
+SELECT a.ID, a.Nazwa AS PismoNazwa, a.Data_Wplyniecia, 
+       c.Nazwa AS NadawcaNazwa, c.Imie, c.Nazwisko,
+       d.Imie AS WlascicielImie, d.Nazwisko AS WlascicielNazwisko, b.ZnakWplywu
+FROM dbo.Pisma a 
+JOIN dbo.Dokument b ON a.ID = b.IdPisma
+JOIN dbo.Adresaci c ON b.MetaIdAdresata = c.Id
+JOIN dbo.Pracownicy d ON a.IdPracownikaWlasciciela = d.ID
+WHERE 1=1");
 
             // Dodajemy warunki do zapytania w zależności od wypełnionych pól
             if (!string.IsNullOrEmpty(searchDocumentName))
@@ -87,7 +91,10 @@ namespace YourNamespace.Controllers
             if (endDate.HasValue)
                 queryBuilder.Append(" AND a.Data_Wplyniecia <= @endDate");
 
-            queryBuilder.Append(" GROUP BY a.ID, a.Nazwa, a.Data_Wplyniecia, c.Nazwa, c.Imie, c.Nazwisko, d.Imie, d.Nazwisko");
+            if (!string.IsNullOrEmpty(searchZnakWplywu))
+                queryBuilder.Append(" AND b.ZnakWplywu LIKE @searchZnakWplywu");  // Dodajemy warunek dla ZnakWplywu
+
+            queryBuilder.Append(" GROUP BY a.ID, a.Nazwa, a.Data_Wplyniecia, c.Nazwa, c.Imie, c.Nazwisko, d.Imie, d.Nazwisko, b.ZnakWplywu");
 
             var pisma = new List<PismoModel>();
 
@@ -113,6 +120,9 @@ namespace YourNamespace.Controllers
                 if (endDate.HasValue)
                     command.Parameters.AddWithValue("@endDate", endDate);
 
+                if (!string.IsNullOrEmpty(searchZnakWplywu))
+                    command.Parameters.AddWithValue("@searchZnakWplywu", "%" + searchZnakWplywu + "%");
+
                 await connection.OpenAsync();
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -127,7 +137,8 @@ namespace YourNamespace.Controllers
                             Imie = reader["Imie"].ToString(),
                             Nazwisko = reader["Nazwisko"].ToString(),
                             WlascicielImie = reader["WlascicielImie"].ToString(),
-                            WlascicielNazwisko = reader["WlascicielNazwisko"].ToString()
+                            WlascicielNazwisko = reader["WlascicielNazwisko"].ToString(),
+                            ZnakWplywu = reader["ZnakWplywu"].ToString()
                         };
                         pisma.Add(pismo);
                     }
@@ -137,20 +148,25 @@ namespace YourNamespace.Controllers
             return pisma;
         }
 
-        private async Task<List<SprawaModel>> GetSprawyAsync(string searchName, string searchSurname, string searchFirstName, DateTime? startDate, DateTime? endDate)
+
+        private async Task<List<SprawaModel>> GetSprawyAsync(string searchName, string searchSurname, string searchFirstName, DateTime? startDate, DateTime? endDate, string searchZnak)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["MyDbContext"].ConnectionString;
             var queryBuilder = new StringBuilder(@"
-        SELECT a.Znak, a.Uwagi, a.DataRejestracji, a.DataZakonczenia, 
-               d.Imie + ' ' + d.Nazwisko AS Prowadzący, 
-               c.Imie + ' ' + c.Nazwisko AS 'Imię Nazwisko', 
-               c.Nazwa AS 'Nazwa Podmiotu',
-               b.IdPisma
-        FROM dbo.SpisSpraw a
-        JOIN dbo.Dokument b ON a.IdDokumentuWszczynajacego = b.Id
-        JOIN dbo.Adresaci c ON b.MetaIdAdresata = c.Id
-        JOIN dbo.Pracownicy d ON a.IdProwadzacy = d.Id
-        WHERE 1=1");
+SELECT a.Znak, a.Uwagi, a.DataRejestracji, a.DataZakonczenia, 
+       d.Imie + ' ' + d.Nazwisko AS Prowadzący, 
+       c.Imie + ' ' + c.Nazwisko AS 'Imię Nazwisko', 
+       c.Nazwa AS 'Nazwa Podmiotu',
+       b.IdPisma
+FROM dbo.SpisSpraw a
+JOIN dbo.Dokument b ON a.IdDokumentuWszczynajacego = b.Id
+JOIN dbo.Adresaci c ON b.MetaIdAdresata = c.Id
+JOIN dbo.Pracownicy d ON a.IdProwadzacy = d.Id
+WHERE 1=1");
+
+            
+            if (!string.IsNullOrEmpty(searchZnak))
+                queryBuilder.Append(" AND a.Znak LIKE @searchZnak");
 
             if (!string.IsNullOrEmpty(searchName))
                 queryBuilder.Append(" AND c.Nazwa LIKE @searchName");
@@ -174,6 +190,9 @@ namespace YourNamespace.Controllers
                 using (var connection = new SqlConnection(connectionString))
                 using (var command = new SqlCommand(queryBuilder.ToString(), connection))
                 {
+                    if (!string.IsNullOrEmpty(searchZnak))
+                        command.Parameters.AddWithValue("@searchZnak", "%" + searchZnak + "%");
+
                     if (!string.IsNullOrEmpty(searchName))
                         command.Parameters.AddWithValue("@searchName", "%" + searchName + "%");
 
@@ -212,21 +231,10 @@ namespace YourNamespace.Controllers
                     }
                 }
             }
-            catch (SqlException sqlEx)
-            {
-                // Log the SQL exception details (e.g., using a logging framework)
-                // LogException(sqlEx);
-
-                // Optionally, you can re-throw the exception to handle it higher up
-                throw new ApplicationException("Wystąpił błąd podczas wykonywania zapytania do bazy danych.", sqlEx);
-            }
             catch (Exception ex)
             {
-                // Log the general exception details
-                // LogException(ex);
-
-                // Optionally, you can re-throw the exception to handle it higher up
-                throw new ApplicationException("Wystąpił błąd podczas przetwarzania danych.", ex);
+                // Obsługa błędów
+                Console.WriteLine(ex.Message);
             }
 
             return sprawy;

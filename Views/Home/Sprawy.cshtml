@@ -17,6 +17,10 @@
         <form method="get" action="@Url.Action("Sprawy", "Home")">
             <div class="form-group">
                 <div>
+                    <label for="searchZnak">Znak Sprawy:</label>
+                    <input type="text" name="searchZnak" id="searchZnak" value="@ViewBag.SearchZnak" />
+                </div>
+                <div>
                     <label for="searchName">Nazwa Podmiotu:</label>
                     <input type="text" name="searchName" id="searchName" value="@ViewBag.SearchName" />
                 </div>
@@ -76,7 +80,7 @@
                 </tbody>
             </table>
         }
-        else if (!string.IsNullOrEmpty(ViewBag.SearchName) || !string.IsNullOrEmpty(ViewBag.SearchSurname))
+        else if (!string.IsNullOrEmpty(ViewBag.SearchZnak) || !string.IsNullOrEmpty(ViewBag.SearchName) || !string.IsNullOrEmpty(ViewBag.SearchSurname))
         {
             <p>Nie znaleziono wyników dla podanych kryteriów wyszukiwania.</p>
         }

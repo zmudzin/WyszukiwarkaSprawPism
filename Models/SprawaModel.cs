@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace YourNamespace.Models
 {
@@ -24,5 +25,6 @@ namespace YourNamespace.Models
         public string Nazwisko { get; set; }
         public string WlascicielImie { get; set; }  // Nowa właściwość
         public string WlascicielNazwisko { get; set; }  // Nowa właściwość
+        public string ZnakWplywu { get; set; }
     }
 }

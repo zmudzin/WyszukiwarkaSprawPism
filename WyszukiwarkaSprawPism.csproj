@@ -178,7 +178,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Sprawy.cshtml" />
-    <Content Include="Views\Home\WyszukiwarkaPism.cshtml" />
+    <Content Include="Views\Home\Pisma.cshtml" />
     <Content Include="Web — Kopia.config" />
     <Content Include="Web — Kopia.Debug.config">
       <DependentUpon>Web — Kopia.config</DependentUpon>

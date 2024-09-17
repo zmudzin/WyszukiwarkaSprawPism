@@ -10,7 +10,7 @@ public class RouteConfig
         routes.MapRoute(
             name: "Pisma",
             url: "pisma",
-            defaults: new { controller = "Home", action = "WyszukiwarkaPism" }
+            defaults: new { controller = "Home", action = "Pisma" }
         );
 
         routes.MapRoute(

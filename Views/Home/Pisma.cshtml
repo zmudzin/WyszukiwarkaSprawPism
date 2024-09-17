@@ -14,23 +14,27 @@
     <div class="container">
         <h2>Wyszukiwarka Pism</h2>
 
-        <form method="get" action="@Url.Action("WyszukiwarkaPism", "Home")">
+        <form method="get" action="@Url.Action("Pisma", "Home")">
             <div class="form-group">
                 <div>
-                    <label for="searchDocumentName">Nazwa Pisma:</label>
+                    <label for="searchDocumentName">Nazwa dokumentu:</label>
                     <input type="text" name="searchDocumentName" id="searchDocumentName" value="@ViewBag.SearchDocumentName" />
                 </div>
                 <div>
-                    <label for="searchSenderName">Nazwa Nadawcy:</label>
+                    <label for="searchSenderName">Nazwa nadawcy:</label>
                     <input type="text" name="searchSenderName" id="searchSenderName" value="@ViewBag.SearchSenderName" />
                 </div>
                 <div>
-                    <label for="searchFirstName">Imię:</label>
+                    <label for="searchFirstName">Imię nadawcy:</label>
                     <input type="text" name="searchFirstName" id="searchFirstName" value="@ViewBag.SearchFirstName" />
                 </div>
                 <div>
-                    <label for="searchLastName">Nazwisko:</label>
+                    <label for="searchLastName">Nazwisko nadawcy:</label>
                     <input type="text" name="searchLastName" id="searchLastName" value="@ViewBag.SearchLastName" />
+                </div>
+                <div>
+                    <label for="searchZnakWplywu">RPW:</label>
+                    <input type="text" name="searchZnakWplywu" id="searchZnakWplywu" value="@ViewBag.SearchZnakWplywu" />
                 </div>
             </div>
             <div class="form-group">
@@ -51,10 +55,12 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Nazwa Pisma</th>
-                        <th>Data Wpłynięcia</th>
-                        <th>Nadawca</th>
+                        <th>Nazwa</th>
+                        <th>Data wpływu</th>
+                        <th>Nadawca osoba</th>
+                        <th>Nadawca podmiot</th>
                         <th>Właściciel</th>
+                        <th>RPW</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,17 +73,16 @@
                                 </a>
                             </td>
                             <td>@item.DataWplyniecia.ToString("yyyy-MM-dd")</td>
-                            <td>
-                                @item.NadawcaNazwa <br />
-                                @item.Imie @item.Nazwisko
-                            </td>
+                            <td>@item.Imie @item.Nazwisko</td>
+                            <td>@item.NadawcaNazwa</td>
                             <td>@item.WlascicielImie @item.WlascicielNazwisko</td>
+                            <td>@item.ZnakWplywu</td>
                         </tr>
                     }
                 </tbody>
             </table>
         }
-        else if (!string.IsNullOrEmpty(ViewBag.SearchDocumentName) || !string.IsNullOrEmpty(ViewBag.SearchSenderName) || !string.IsNullOrEmpty(ViewBag.SearchFirstName) || !string.IsNullOrEmpty(ViewBag.SearchLastName) || ViewBag.StartDate != null || ViewBag.EndDate != null)
+        else if (!string.IsNullOrEmpty(ViewBag.SearchDocumentName) || !string.IsNullOrEmpty(ViewBag.SearchSenderName) || !string.IsNullOrEmpty(ViewBag.SearchFirstName) || !string.IsNullOrEmpty(ViewBag.SearchLastName) || !string.IsNullOrEmpty(ViewBag.SearchZnakWplywu))
         {
             <p>Nie znaleziono wyników dla podanych kryteriów wyszukiwania.</p>
         }
