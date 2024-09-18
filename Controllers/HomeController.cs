@@ -12,15 +12,17 @@ namespace YourNamespace.Controllers
     public class HomeController : Controller
     {
 
-        public async Task<ActionResult> Sprawy(string searchName, string searchSurname, string searchFirstName, DateTime? startDate, DateTime? endDate, string searchZnak)
+        public async Task<ActionResult> Sprawy(string searchName, string searchSurname, string searchFirstName, DateTime? startDate, DateTime? endDate, string searchZnak, int page = 1, int pageSize = 10)
         {
-            // Przekazanie wartości wyszukiwania do widoku
+            // Przekazanie wartości wyszukiwania i paginacji do widoku
             ViewBag.SearchName = searchName;
             ViewBag.SearchSurname = searchSurname;
             ViewBag.SearchFirstName = searchFirstName;
             ViewBag.StartDate = startDate;
             ViewBag.EndDate = endDate;
-            ViewBag.SearchZnak = searchZnak;  // Dodajemy searchZnak do ViewBag
+            ViewBag.SearchZnak = searchZnak;
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
 
             // Jeśli brak kryteriów wyszukiwania, nie wykonuj zapytania do bazy danych
             if (string.IsNullOrEmpty(searchName) && string.IsNullOrEmpty(searchSurname) &&
@@ -30,12 +32,12 @@ namespace YourNamespace.Controllers
             }
 
             // Jeśli są kryteria, wykonaj zapytanie
-            var model = await GetSprawyAsync(searchName, searchSurname, searchFirstName, startDate, endDate, searchZnak);
+            var model = await GetSprawyAsync(searchName, searchSurname, searchFirstName, startDate, endDate, searchZnak, page, pageSize);
             return View(model);
         }
 
 
-        public async Task<ActionResult> Pisma(string searchDocumentName, string searchSenderName, string searchFirstName, string searchLastName, DateTime? startDate, DateTime? endDate, string searchZnakWplywu)
+        public async Task<ActionResult> Pisma(string searchDocumentName, string searchSenderName, string searchFirstName, string searchLastName, DateTime? startDate, DateTime? endDate, string searchZnakWplywu, int page = 1, int pageSize = 10)
         {
             // Przekazanie wartości wyszukiwania do widoku
             ViewBag.SearchDocumentName = searchDocumentName;
@@ -44,7 +46,7 @@ namespace YourNamespace.Controllers
             ViewBag.SearchLastName = searchLastName;
             ViewBag.StartDate = startDate;
             ViewBag.EndDate = endDate;
-            ViewBag.SearchZnakWplywu = searchZnakWplywu;  // Dodajemy searchZnakWplywu do ViewBag
+            ViewBag.SearchZnakWplywu = searchZnakWplywu;
 
             // Jeśli brak kryteriów wyszukiwania, nie wykonuj zapytania do bazy danych
             if (string.IsNullOrEmpty(searchDocumentName) && string.IsNullOrEmpty(searchSenderName) &&
@@ -54,12 +56,18 @@ namespace YourNamespace.Controllers
                 return View(new List<PismoModel>());
             }
 
-            // Jeśli są kryteria, wykonaj zapytanie
-            var model = await GetPismaAsync(searchDocumentName, searchSenderName, searchFirstName, searchLastName, startDate, endDate, searchZnakWplywu);
+            // Paginacja
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+
+            // Jeśli są kryteria, wykonaj zapytanie z paginacją
+            var model = await GetPismaAsync(searchDocumentName, searchSenderName, searchFirstName, searchLastName, startDate, endDate, searchZnakWplywu, page, pageSize);
+
             return View(model);
         }
 
-        private async Task<List<PismoModel>> GetPismaAsync(string searchDocumentName, string searchSenderName, string searchFirstName, string searchLastName, DateTime? startDate, DateTime? endDate, string searchZnakWplywu)
+
+        private async Task<List<PismoModel>> GetPismaAsync(string searchDocumentName, string searchSenderName, string searchFirstName, string searchLastName, DateTime? startDate, DateTime? endDate, string searchZnakWplywu, int page, int pageSize)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["MyDbContext"].ConnectionString;
             var queryBuilder = new StringBuilder(@"
@@ -72,7 +80,7 @@ JOIN dbo.Adresaci c ON b.MetaIdAdresata = c.Id
 JOIN dbo.Pracownicy d ON a.IdPracownikaWlasciciela = d.ID
 WHERE 1=1");
 
-            // Dodajemy warunki do zapytania w zależności od wypełnionych pól
+            // warunki do zapytania w zależności od wypełnionych pól
             if (!string.IsNullOrEmpty(searchDocumentName))
                 queryBuilder.Append(" AND a.Nazwa LIKE @searchDocumentName");
 
@@ -92,9 +100,11 @@ WHERE 1=1");
                 queryBuilder.Append(" AND a.Data_Wplyniecia <= @endDate");
 
             if (!string.IsNullOrEmpty(searchZnakWplywu))
-                queryBuilder.Append(" AND b.ZnakWplywu LIKE @searchZnakWplywu");  // Dodajemy warunek dla ZnakWplywu
+                queryBuilder.Append(" AND b.ZnakWplywu LIKE @searchZnakWplywu");
 
-            queryBuilder.Append(" GROUP BY a.ID, a.Nazwa, a.Data_Wplyniecia, c.Nazwa, c.Imie, c.Nazwisko, d.Imie, d.Nazwisko, b.ZnakWplywu");
+            // Dodaj paginację
+            queryBuilder.Append(" ORDER BY a.Data_Wplyniecia DESC");
+            queryBuilder.Append(" OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY");
 
             var pisma = new List<PismoModel>();
 
@@ -123,6 +133,10 @@ WHERE 1=1");
                 if (!string.IsNullOrEmpty(searchZnakWplywu))
                     command.Parameters.AddWithValue("@searchZnakWplywu", "%" + searchZnakWplywu + "%");
 
+                // Dodaj parametry paginacji
+                command.Parameters.AddWithValue("@Offset", (page - 1) * pageSize);
+                command.Parameters.AddWithValue("@PageSize", pageSize);
+
                 await connection.OpenAsync();
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -149,22 +163,22 @@ WHERE 1=1");
         }
 
 
-        private async Task<List<SprawaModel>> GetSprawyAsync(string searchName, string searchSurname, string searchFirstName, DateTime? startDate, DateTime? endDate, string searchZnak)
+
+        private async Task<List<SprawaModel>> GetSprawyAsync(string searchName, string searchSurname, string searchFirstName, DateTime? startDate, DateTime? endDate, string searchZnak, int page = 1, int pageSize = 10)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["MyDbContext"].ConnectionString;
             var queryBuilder = new StringBuilder(@"
-SELECT a.Znak, a.Uwagi, a.DataRejestracji, a.DataZakonczenia, 
-       d.Imie + ' ' + d.Nazwisko AS Prowadzący, 
-       c.Imie + ' ' + c.Nazwisko AS 'Imię Nazwisko', 
-       c.Nazwa AS 'Nazwa Podmiotu',
-       b.IdPisma
-FROM dbo.SpisSpraw a
-JOIN dbo.Dokument b ON a.IdDokumentuWszczynajacego = b.Id
-JOIN dbo.Adresaci c ON b.MetaIdAdresata = c.Id
-JOIN dbo.Pracownicy d ON a.IdProwadzacy = d.Id
-WHERE 1=1");
+    SELECT a.Znak, a.Uwagi, a.DataRejestracji, a.DataZakonczenia, 
+           d.Imie + ' ' + d.Nazwisko AS Prowadzący, 
+           c.Imie + ' ' + c.Nazwisko AS 'Imię Nazwisko', 
+           c.Nazwa AS 'Nazwa Podmiotu',
+           b.IdPisma
+    FROM dbo.SpisSpraw a
+    JOIN dbo.Dokument b ON a.IdDokumentuWszczynajacego = b.Id
+    JOIN dbo.Adresaci c ON b.MetaIdAdresata = c.Id
+    JOIN dbo.Pracownicy d ON a.IdProwadzacy = d.Id
+    WHERE 1=1");
 
-            
             if (!string.IsNullOrEmpty(searchZnak))
                 queryBuilder.Append(" AND a.Znak LIKE @searchZnak");
 
@@ -182,6 +196,10 @@ WHERE 1=1");
 
             if (endDate.HasValue)
                 queryBuilder.Append(" AND a.DataRejestracji <= @endDate");
+
+            queryBuilder.Append($@"
+    ORDER BY a.DataRejestracji
+    OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY");
 
             var sprawy = new List<SprawaModel>();
 
@@ -207,6 +225,9 @@ WHERE 1=1");
 
                     if (endDate.HasValue)
                         command.Parameters.AddWithValue("@endDate", endDate);
+
+                    command.Parameters.AddWithValue("@Offset", (page - 1) * pageSize);
+                    command.Parameters.AddWithValue("@PageSize", pageSize);
 
                     await connection.OpenAsync();
                     using (var reader = await command.ExecuteReaderAsync())
@@ -239,6 +260,7 @@ WHERE 1=1");
 
             return sprawy;
         }
+
 
     }
 }

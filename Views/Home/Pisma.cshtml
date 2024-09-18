@@ -81,6 +81,16 @@
                     }
                 </tbody>
             </table>
+            <div class="pagination">
+                @if (ViewBag.Page > 1)
+                {
+                    <a href="@Url.Action("Pisma", new { searchDocumentName = ViewBag.SearchDocumentName, searchSenderName = ViewBag.SearchSenderName, searchFirstName = ViewBag.SearchFirstName, searchLastName = ViewBag.SearchLastName, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, searchZnakWplywu = ViewBag.SearchZnakWplywu, page = ViewBag.Page - 1, pageSize = ViewBag.PageSize })">Poprzednia</a>
+                }
+
+                <span>Strona @ViewBag.Page</span>
+
+                <a href="@Url.Action("Pisma", new { searchDocumentName = ViewBag.SearchDocumentName, searchSenderName = ViewBag.SearchSenderName, searchFirstName = ViewBag.SearchFirstName, searchLastName = ViewBag.SearchLastName, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, searchZnakWplywu = ViewBag.SearchZnakWplywu, page = ViewBag.Page + 1, pageSize = ViewBag.PageSize })">Następna</a>
+            </div>
         }
         else if (!string.IsNullOrEmpty(ViewBag.SearchDocumentName) || !string.IsNullOrEmpty(ViewBag.SearchSenderName) || !string.IsNullOrEmpty(ViewBag.SearchFirstName) || !string.IsNullOrEmpty(ViewBag.SearchLastName) || !string.IsNullOrEmpty(ViewBag.SearchZnakWplywu))
         {

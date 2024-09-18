@@ -79,6 +79,16 @@
                     }
                 </tbody>
             </table>
+            <div class="pagination">
+                @if (ViewBag.Page > 1)
+                {
+                    <a href="@Url.Action("Sprawy", new { searchName = ViewBag.SearchName, searchSurname = ViewBag.SearchSurname, searchFirstName = ViewBag.SearchFirstName, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, searchZnak = ViewBag.SearchZnak, page = ViewBag.Page - 1, pageSize = ViewBag.PageSize })">Poprzednia</a>
+                }
+
+                <span>Strona @ViewBag.Page</span>
+
+                <a href="@Url.Action("Sprawy", new { searchName = ViewBag.SearchName, searchSurname = ViewBag.SearchSurname, searchFirstName = ViewBag.SearchFirstName, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, searchZnak = ViewBag.SearchZnak, page = ViewBag.Page + 1, pageSize = ViewBag.PageSize })">Następna</a>
+            </div>
         }
         else if (!string.IsNullOrEmpty(ViewBag.SearchZnak) || !string.IsNullOrEmpty(ViewBag.SearchName) || !string.IsNullOrEmpty(ViewBag.SearchSurname))
         {
