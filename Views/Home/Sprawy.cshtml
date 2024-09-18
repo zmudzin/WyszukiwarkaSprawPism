@@ -82,12 +82,16 @@
             <div class="pagination">
                 @if (ViewBag.Page > 1)
                 {
-                    <a href="@Url.Action("Sprawy", new { searchName = ViewBag.SearchName, searchSurname = ViewBag.SearchSurname, searchFirstName = ViewBag.SearchFirstName, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, searchZnak = ViewBag.SearchZnak, page = ViewBag.Page - 1, pageSize = ViewBag.PageSize })">Poprzednia</a>
+                    <a href="@Url.Action("Sprawy", new { searchName = ViewBag.SearchName, searchSurname = ViewBag.SearchSurname, searchFirstName = ViewBag.SearchFirstName, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, searchZnak = ViewBag.SearchZnak, page = ViewBag.Page - 1, pageSize = ViewBag.PageSize })">
+                       <img src="~/Content/images/left.png" alt="Poprzednia strona" />
+                    </a>
                 }
 
                 <span>Strona @ViewBag.Page</span>
 
-                <a href="@Url.Action("Sprawy", new { searchName = ViewBag.SearchName, searchSurname = ViewBag.SearchSurname, searchFirstName = ViewBag.SearchFirstName, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, searchZnak = ViewBag.SearchZnak, page = ViewBag.Page + 1, pageSize = ViewBag.PageSize })">Następna</a>
+                <a href="@Url.Action("Sprawy", new { searchName = ViewBag.SearchName, searchSurname = ViewBag.SearchSurname, searchFirstName = ViewBag.SearchFirstName, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, searchZnak = ViewBag.SearchZnak, page = ViewBag.Page + 1, pageSize = ViewBag.PageSize })">
+                    <img src="~/Content/images/right.png" alt="Następna strona" />
+                </a>
             </div>
         }
         else if (!string.IsNullOrEmpty(ViewBag.SearchZnak) || !string.IsNullOrEmpty(ViewBag.SearchName) || !string.IsNullOrEmpty(ViewBag.SearchSurname))
